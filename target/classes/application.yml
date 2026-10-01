@@ -1,0 +1,31 @@
+server:
+  port: ${SERVER_PORT:8083}
+spring:
+  application:
+    name: ms-talleres360-report
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:local}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: update
+app:
+  internal-key: ${INTERNAL_API_KEY:}
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+  datasource:
+    url: jdbc:h2:mem:reportdb;DB_CLOSE_DELAY=-1
+    username: sa
+    password:
+---
+spring:
+  config:
+    activate:
+      on-profile: postgres
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
