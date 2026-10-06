@@ -4,7 +4,9 @@ Servicio Spring Boot independiente (puerto 8083, base `report_db`). Conserva eve
 
 ## Ejecutar
 
-El Compose local `infra/apps/compose.yml` y el de EC2 `infra/ms/compose.yml` crean el servicio y su PostgreSQL independiente. Configura la **misma** `INTERNAL_API_KEY` en backend y BFF. Para desarrollo aislado, `mvn spring-boot:run` inicia con H2 en memoria; no conserva eventos al detener. Este módulo no tiene wrapper propio: desde su carpeta puedes usar `../ms-talleres360-orders/mvnw -f pom.xml spring-boot:run` (Windows: `..\ms-talleres360-orders\mvnw.cmd -f pom.xml spring-boot:run`). Sustituye el objetivo por `test` para las pruebas.
+Este repositorio tiene su propio `compose.yml`: copia `.env.example` a `.env`, configura DB_PASSWORD e INTERNAL_API_KEY, y ejecuta `docker compose up -d --build`. Levanta solo Reportería y su PostgreSQL persistente. La clave interna debe coincidir con Órdenes, Catálogo y BFF. Consulta [DESPLIEGUE_EC2.md](DESPLIEGUE_EC2.md) para su EC2 independiente.
+
+Para desarrollo aislado usa Java 17 y Maven instalado: `mvn spring-boot:run` inicia con H2 en memoria y no conserva eventos al detener. Este repositorio no incluye Maven Wrapper; el Dockerfile incluye Maven para compilar sin depender de otros repositorios. Con Maven instalado, ejecuta `mvn test` para las pruebas.
 
 ## API interna
 

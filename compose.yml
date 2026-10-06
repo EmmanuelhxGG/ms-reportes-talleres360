@@ -1,0 +1,44 @@
+# Ejecutar desde este repositorio: docker compose up -d --build
+name: talleres360-reportes
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: report_db
+      POSTGRES_USER: ${DB_USERNAME:?Configura DB_USERNAME en .env}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?Configura DB_PASSWORD en .env}
+      TZ: America/Santiago
+    volumes:
+      - datos_postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+    # PostgreSQL no publica su puerto en la EC2.
+
+  reportes:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: talleres360/ms-reportes:local
+    ports:
+      - "8083:8083"
+    environment:
+      SERVER_PORT: "8083"
+      SPRING_PROFILES_ACTIVE: postgres
+      TZ: America/Santiago
+      JAVA_TOOL_OPTIONS: "-XX:MaxRAMPercentage=60"
+      DB_URL: jdbc:postgresql://postgres:5432/report_db
+      DB_USERNAME: ${DB_USERNAME:?Configura DB_USERNAME en .env}
+      DB_PASSWORD: ${DB_PASSWORD:?Configura DB_PASSWORD en .env}
+      INTERNAL_API_KEY: ${INTERNAL_API_KEY:?Configura INTERNAL_API_KEY en .env}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  datos_postgres:
