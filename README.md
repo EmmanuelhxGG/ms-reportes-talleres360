@@ -27,7 +27,6 @@ Las rutas Java parten de `src/main/java/com/talleres360/report/`.
 | `model/BusinessEvent.java` | Evento persistido con actor, fecha, estado y total. |
 | `repository/BusinessEventRepository.java` | Consultas por orden, fecha y tipo de evento. |
 | `src/main/resources/application.yml` | Puerto, clave y perfiles local/PostgreSQL. |
-| `src/test/` | Pruebas de ventas e idempotencia con H2. |
 | `Dockerfile`, `compose.yml`, `.env.example` | Construcción y despliegue independientes. |
 
 ## Eventos de negocio
@@ -134,10 +133,10 @@ docker compose up -d --build
 
 El volumen conserva eventos al reconstruir/recrear contenedores. **`docker compose down -v` elimina los datos.** `restart: unless-stopped` reinicia los contenedores con Docker salvo detenciones manuales; requiere Docker habilitado al arrancar la EC2. No enciende una instancia apagada ni descarga cambios de GitHub.
 
-## Pruebas
+## Comprobar empaquetado
 
 ```bash
-mvn test
+mvn -DskipTests package
 ```
 
-El 6 de octubre de 2026 pasaron **2 pruebas locales** con H2: ventas de entregas e idempotencia por evento. Ese resultado no certifica el despliegue AWS. Una llamada sin clave válida devuelve 401. Mantén `.env`, contraseñas, tokens y PEM fuera del repositorio.
+La revisión local del 8 de octubre verificó ventas e idempotencia con H2, no el despliegue AWS. Los archivos de pruebas no forman parte de esta versión. Una llamada sin clave válida devuelve 401. Mantén `.env`, contraseñas, tokens y PEM fuera del repositorio.
