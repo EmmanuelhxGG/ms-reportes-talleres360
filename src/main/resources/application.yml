@@ -1,6 +1,23 @@
 server:
   port: ${SERVER_PORT:8083}
 spring:
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    consumer:
+      group-id: ${KAFKA_GROUP_ID:talleres360-reporteria}
+      auto-offset-reset: earliest
+      enable-auto-commit: false
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      acks: all
+      properties:
+        enable.idempotence: true
+    listener:
+      auto-startup: ${KAFKA_ENABLED:false}
+      ack-mode: record
   application:
     name: ms-talleres360-report
   profiles:
@@ -10,6 +27,9 @@ spring:
     hibernate:
       ddl-auto: update
 app:
+  kafka:
+    enabled: ${KAFKA_ENABLED:false}
+    topic: ${KAFKA_ORDERS_TOPIC:orders.events}
   internal-key: ${INTERNAL_API_KEY:}
 ---
 spring:
