@@ -6,12 +6,11 @@ Documentación del código al 6 de octubre de 2026.
 
 ## Responsabilidad y conexiones
 
-Con `KAFKA_ENABLED=true` consume `orders.events`, grupo `talleres360-reporteria`,
-independiente del grupo de Auditoría. Valida y guarda cada eventId una sola vez;
-reintenta errores y publica los no recuperables en `orders.events.report.DLT`
-antes de avanzar el offset. Las consultas HTTP del BFF no cambian. La ingesta HTTP
-interna se conserva como alternativa; el productor Órdenes activa un único
-transporte para sus eventos, no ambos simultáneamente.
+Desde el 21 de octubre de 2026 recibe eventos por `POST /internal/events` desde
+el outbox HTTP de Órdenes. Guarda cada eventId una sola vez. Órdenes confirma cada
+entrega exitosa y reintenta las pendientes; no utiliza Kafka ni un DLT.
+Las consultas HTTP del BFF y los datos históricos se conservan. RabbitMQ se usa
+para las tareas de Notificaciones, no para calcular las ventas.
 
 Recibe eventos de negocio de Órdenes, conserva quién realizó cada acción y calcula ventas de órdenes entregadas. El BFF expone las consultas únicamente a Admin; los usuarios no editan ni borran eventos de auditoría.
 
