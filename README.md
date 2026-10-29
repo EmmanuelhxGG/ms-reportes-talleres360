@@ -1,5 +1,13 @@
 # Microservicio de Reportería de Talleres360
 
+## Base de datos compartida
+
+La configuración actual usa una sola PostgreSQL `talleres360` para los cinco
+microservicios. `compose.yml` levanta solo esta aplicación y exige `DB_URL`.
+Consulta [BASE_DE_DATOS.md](BASE_DE_DATOS.md) para conexión y comandos de consulta.
+Los ejemplos antiguos con una base por servicio describen el despliegue anterior.
+
+
 Servicio independiente de ventas y actividad de órdenes. Java 21, Spring Boot 3.5.6, JPA, validación y Lombok. Puerto **8083**; PostgreSQL **report_db** en Docker y H2 en memoria para desarrollo. Rama **`backend-emmanuel`**. [Repositorio](https://github.com/EmmanuelhxGG/ms-reportes-talleres360).
 
 Documentación actualizada el **22 de octubre de 2026**. Los ejemplos usan datos
