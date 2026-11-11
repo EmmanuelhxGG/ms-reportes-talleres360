@@ -15,9 +15,10 @@ ficticios y marcadores, sin información privada de una cuenta AWS.
 
 ## Responsabilidad y conexiones
 
-Desde el 21 de octubre de 2026 recibe eventos por `POST /internal/events` desde
-el outbox HTTP de Órdenes. Guarda cada eventId una sola vez. Órdenes confirma cada
-entrega exitosa y reintenta las pendientes; no utiliza Kafka ni un DLT.
+Con KAFKA_ENABLED=true consume orders.events en el grupo talleres360-reporteria.
+Guarda cada eventId con stock confirmado una sola vez y deriva los registros
+que agotan reintentos a orders.events.reporteria.DLT. El endpoint interno sigue
+disponible para instalaciones configuradas con outbox HTTP.
 Las consultas HTTP del BFF y los datos históricos se conservan. RabbitMQ se usa
 para las tareas de Notificaciones, no para calcular las ventas.
 
@@ -27,7 +28,7 @@ expone reportes solo a Admin. La consulta de auditoría de la interfaz se sirve
 desde el microservicio independiente de Auditoría, no desde esta proyección.
 
 ```text
-Órdenes/outbox ──► POST /internal/events ──► PostgreSQL report_db
+Órdenes/outbox ──► Kafka orders.events ──► Reportería ──► PostgreSQL talleres360
 BFF/Admin ──────► GET ventas ─────────────► Reportería :8083
 ```
 
@@ -117,7 +118,7 @@ INTERNAL_API_KEY=<CLAVE_COMPARTIDA_CON_BFF_Y_MICROS>
 Compose configura el puerto 8083, perfil `postgres` y conexión `jdbc:postgresql://postgres:5432/report_db`. PostgreSQL tiene su propio volumen `datos_postgres` y no publica 5432 en la EC2. Hibernate utiliza `ddl-auto=update`.
 
 Sustituye los marcadores fuera del repositorio. No requiere IDs de Azure,
-credenciales SMTP ni variables Rabbit/Kafka. Las credenciales de base son de este
+credenciales SMTP ni RabbitMQ. Para Kafka configura KAFKA_ENABLED y KAFKA_BOOTSTRAP_SERVERS. Las credenciales de base son de este
 servicio; la clave interna debe coincidir con BFF y Órdenes.
 
 ## Ejecutar
