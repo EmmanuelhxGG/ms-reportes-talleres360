@@ -45,6 +45,15 @@ misma instancia de base de datos.
 
 - `eventos_reporteria`
 
+## Actualización para los KPIs de Kafka
+
+En la base compartida de AWS, aplica
+[`infra/database/20261118_productos_venta.sql`](infra/database/20261118_productos_venta.sql)
+desde la EC2 de Órdenes con el usuario administrador del contenedor PostgreSQL,
+antes de arrancar la versión de Reportería que expone `/api/reports/kpis`.
+El script agrega la columna si hace falta y deja las entregas anteriores intactas.
+Reportería conserva la validación del esquema y sus permisos acotados.
+
 Las tablas y columnas de aplicación están en español. Los historiales de Flyway
 conservan sus columnas técnicas para mantener compatibilidad con esa herramienta.
 Los contratos JSON del BFF y del frontend no cambian por este renombrado físico.
