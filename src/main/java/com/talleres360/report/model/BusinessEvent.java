@@ -1,5 +1,6 @@
 package com.talleres360.report.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,4 +22,6 @@ public class BusinessEvent {
     @Column(name = "ocurrido_en", nullable = false) private Instant occurredAt;
     @Column(name = "total", precision = 12, scale = 2) private BigDecimal total;
     @Column(name = "estado", length = 30) private String status;
+    @JsonIgnore
+    @Column(name = "productos_venta_json", columnDefinition = "text") private String productosVentaJson;
 }

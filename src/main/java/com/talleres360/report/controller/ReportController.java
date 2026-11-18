@@ -12,6 +12,8 @@ import org.springframework.web.server.ResponseStatusException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.time.Instant;
+import java.time.DateTimeException;
+import java.time.ZoneId;
 import java.util.List;
 
 @RestController @RequiredArgsConstructor
@@ -30,6 +32,19 @@ public class ReportController {
     @GetMapping("/api/reports/sales")
     public SalesReport sales(@RequestHeader(value = "X-Internal-Key", required = false) String key, @RequestParam Instant from, @RequestParam Instant to) {
         check(key); return service.sales(from, to);
+    }
+    @GetMapping("/api/reports/kpis")
+    public KpisReport kpis(@RequestHeader(value = "X-Internal-Key", required = false) String key,
+                         @RequestParam Instant from, @RequestParam Instant to,
+                         @RequestParam(defaultValue = "America/Santiago") String zone) {
+        check(key);
+        try {
+            return service.kpis(from, to, ZoneId.of(zone));
+        } catch (DateTimeException error) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Zona horaria no válida", error);
+        } catch (IllegalArgumentException error) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, error.getMessage(), error);
+        }
     }
     @GetMapping("/api/reports/audit")
     public List<BusinessEvent> audit(@RequestHeader(value = "X-Internal-Key", required = false) String key, @RequestParam(required = false) Long orderId) {

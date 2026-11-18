@@ -1,7 +1,9 @@
 package com.talleres360.report.service;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Validator;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -26,6 +28,17 @@ public class ConsumidorEventosKafka {
     if (!validator.validate(evento).isEmpty()) {
       throw new IllegalArgumentException("Datos inválidos en el evento de orden");
     }
-    if (contenido.get("stockConfirmado").booleanValue()) reportes.ingest(evento);
+    if (!contenido.get("stockConfirmado").booleanValue()) return;
+
+    var detalle = contenido.path("productosVenta");
+    List<ReportService.ProductoVendido> productos = null;
+    if (!detalle.isMissingNode() && !detalle.isNull()) {
+      if (!detalle.isArray()) throw new IllegalArgumentException("El detalle de productos debe ser una lista");
+      productos = json.convertValue(detalle, new TypeReference<>() {});
+      if (productos.stream().anyMatch(producto -> producto == null || !validator.validate(producto).isEmpty())) {
+        throw new IllegalArgumentException("Datos inválidos en los productos de la entrega");
+      }
+    }
+    reportes.ingest(evento, productos);
   }
 }
